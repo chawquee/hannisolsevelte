@@ -1,261 +1,546 @@
-// IP Geolocation utilities
+import { browser } from '$app/environment';
 
+// Geographic data interfaces
 export interface GeolocationData {
-	ip: string;
-	country: string;
-	region: string;
-	city: string;
-	latitude: number;
-	longitude: number;
-	timezone: string;
-	isp: string;
+  ip: string;
+  country: string;
+  countryCode: string;
+  region: string;
+  regionCode: string;
+  city: string;
+  zipCode?: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  isp?: string;
+  organization?: string;
+  accuracy: 'high' | 'medium' | 'low';
+  source: 'browser' | 'ip-api' | 'ipgeolocation' | 'cached';
 }
 
-// Extract client IP from request
-export function getClientIP(request: Request): string {
-	// Check various headers for real IP
-	const forwardedFor = request.headers.get('x-forwarded-for');
-	const realIP = request.headers.get('x-real-ip');
-	const cfConnectingIP = request.headers.get('cf-connecting-ip');
-	
-	if (forwardedFor) {
-		// X-Forwarded-For can contain multiple IPs, take the first one
-		return forwardedFor.split(',')[0].trim();
-	}
-	
-	if (realIP) {
-		return realIP;
-	}
-	
-	if (cfConnectingIP) {
-		return cfConnectingIP;
-	}
-	
-	// Fallback for development
-	return 'unknown';
+export interface IPApiResponse {
+  status: string;
+  country: string;
+  countryCode: string;
+  region: string;
+  regionName: string;
+  city: string;
+  zip: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+  isp: string;
+  org: string;
+  as: string;
+  query: string;
 }
 
-// Get geolocation data from IP (using free services)
-export async function getGeolocation(ip: string): Promise<Partial<GeolocationData>> {
-	// Skip geolocation for local/unknown IPs
-	if (!ip || ip === 'unknown' || ip.startsWith('127.') || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-		return {
-			ip,
-			country: 'Unknown',
-			region: 'Unknown',
-			city: 'Unknown',
-			latitude: 0,
-			longitude: 0,
-			timezone: 'UTC',
-			isp: 'Unknown'
-		};
-	}
-
-	try {
-		// Using ip-api.com (free service with 45 requests/minute limit)
-		const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,lat,lon,timezone,isp`);
-		
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
-		}
-
-		const data = await response.json();
-		
-		if (data.status === 'fail') {
-			console.warn('Geolocation API error:', data.message);
-			return getFallbackGeolocation(ip);
-		}
-
-		return {
-			ip,
-			country: data.country || 'Unknown',
-			region: data.regionName || 'Unknown',
-			city: data.city || 'Unknown',
-			latitude: data.lat || 0,
-			longitude: data.lon || 0,
-			timezone: data.timezone || 'UTC',
-			isp: data.isp || 'Unknown'
-		};
-
-	} catch (error) {
-		console.warn('Geolocation lookup failed:', error);
-		return getFallbackGeolocation(ip);
-	}
+export interface BrowserGeolocation {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude?: number;
+  altitudeAccuracy?: number;
+  heading?: number;
+  speed?: number;
 }
 
-// Fallback geolocation data
-function getFallbackGeolocation(ip: string): Partial<GeolocationData> {
-	return {
-		ip,
-		country: 'Unknown',
-		region: 'Unknown',
-		city: 'Unknown',
-		latitude: 0,
-		longitude: 0,
-		timezone: 'UTC',
-		isp: 'Unknown'
-	};
-}
+// Geolocation configuration
+const GEOLOCATION_CONFIG = {
+  IP_API_URL: 'http://ip-api.com/json',
+  IPGEOLOCATION_API_KEY: process.env.IPGEOLOCATION_API_KEY || '',
+  IPGEOLOCATION_URL: 'https://api.ipgeolocation.io/ipgeo',
+  CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours
+  BROWSER_TIMEOUT: 10000, // 10 seconds
+  RETRY_ATTEMPTS: 3,
+  DEBUG: false
+};
 
-// Alternative geolocation service (backup)
-export async function getGeolocationAlternative(ip: string): Promise<Partial<GeolocationData>> {
-	try {
-		// Using ipify.org + ipapi.co as backup
-		const response = await fetch(`https://ipapi.co/${ip}/json/`);
-		
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
-		}
+// Cache for geolocation data
+const geoCache = new Map<string, { data: GeolocationData; timestamp: number }>();
 
-		const data = await response.json();
-		
-		if (data.error) {
-			console.warn('Alternative geolocation error:', data.reason);
-			return getFallbackGeolocation(ip);
-		}
+// Browser geolocation utilities
+export const browserGeolocation = {
+  // Check if geolocation is supported
+  isSupported(): boolean {
+    return browser && 'geolocation' in navigator;
+  },
 
-		return {
-			ip,
-			country: data.country_name || 'Unknown',
-			region: data.region || 'Unknown',
-			city: data.city || 'Unknown',
-			latitude: parseFloat(data.latitude) || 0,
-			longitude: parseFloat(data.longitude) || 0,
-			timezone: data.timezone || 'UTC',
-			isp: data.org || 'Unknown'
-		};
+  // Get current position from browser
+  async getCurrentPosition(options: {
+    enableHighAccuracy?: boolean;
+    timeout?: number;
+    maximumAge?: number;
+  } = {}): Promise<BrowserGeolocation> {
+    if (!this.isSupported()) {
+      throw new Error('Geolocation is not supported');
+    }
 
-	} catch (error) {
-		console.warn('Alternative geolocation failed:', error);
-		return getFallbackGeolocation(ip);
-	}
-}
+    const defaultOptions = {
+      enableHighAccuracy: true,
+      timeout: GEOLOCATION_CONFIG.BROWSER_TIMEOUT,
+      maximumAge: 300000 // 5 minutes
+    };
 
-// Get country code from IP (lightweight)
-export async function getCountryCode(ip: string): Promise<string> {
-	try {
-		const response = await fetch(`https://ipapi.co/${ip}/country/`);
-		
-		if (response.ok) {
-			const countryCode = await response.text();
-			return countryCode.trim().toUpperCase();
-		}
-		
-		return 'XX';
-	} catch (error) {
-		console.warn('Country code lookup failed:', error);
-		return 'XX';
-	}
-}
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            altitude: position.coords.altitude || undefined,
+            altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
+            heading: position.coords.heading || undefined,
+            speed: position.coords.speed || undefined
+          });
+        },
+        (error) => {
+          let errorMessage = 'Geolocation failed';
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Geolocation permission denied';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Geolocation position unavailable';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Geolocation timeout';
+              break;
+          }
+          
+          reject(new Error(errorMessage));
+        },
+        { ...defaultOptions, ...options }
+      );
+    });
+  },
 
-// Check if IP is from a known VPN/proxy service
-export function isVPNIP(geoData: Partial<GeolocationData>): boolean {
-	if (!geoData.isp) return false;
-	
-	const vpnIndicators = [
-		'vpn', 'proxy', 'tor', 'hosting', 'datacenter', 
-		'cloud', 'server', 'virtual', 'dedicated'
-	];
-	
-	const isp = geoData.isp.toLowerCase();
-	return vpnIndicators.some(indicator => isp.includes(indicator));
-}
+  // Watch position changes
+  watchPosition(
+    callback: (position: BrowserGeolocation) => void,
+    errorCallback?: (error: Error) => void,
+    options: {
+      enableHighAccuracy?: boolean;
+      timeout?: number;
+      maximumAge?: number;
+    } = {}
+  ): number | null {
+    if (!this.isSupported()) {
+      return null;
+    }
 
-// Validate IP address format
-export function isValidIP(ip: string): boolean {
-	// IPv4 regex
-	const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-	
-	// IPv6 regex (simplified)
-	const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
-	
-	return ipv4Regex.test(ip) || ipv6Regex.test(ip);
-}
+    const defaultOptions = {
+      enableHighAccuracy: true,
+      timeout: GEOLOCATION_CONFIG.BROWSER_TIMEOUT,
+      maximumAge: 60000 // 1 minute
+    };
 
-// Get timezone from coordinates
-export function getTimezoneFromCoords(latitude: number, longitude: number): string {
-	// This is a simplified timezone detection
-	// In production, you might want to use a proper timezone API
-	
-	const timezones = [
-		{ name: 'America/New_York', lat: 40.7128, lng: -74.0060 },
-		{ name: 'America/Los_Angeles', lat: 34.0522, lng: -118.2437 },
-		{ name: 'Europe/London', lat: 51.5074, lng: -0.1278 },
-		{ name: 'Europe/Paris', lat: 48.8566, lng: 2.3522 },
-		{ name: 'Asia/Tokyo', lat: 35.6762, lng: 139.6503 },
-		{ name: 'Asia/Shanghai', lat: 31.2304, lng: 121.4737 },
-		{ name: 'Australia/Sydney', lat: -33.8688, lng: 151.2093 }
-	];
-	
-	let closestTimezone = 'UTC';
-	let minDistance = Infinity;
-	
-	for (const tz of timezones) {
-		const distance = Math.sqrt(
-			Math.pow(latitude - tz.lat, 2) + Math.pow(longitude - tz.lng, 2)
-		);
-		
-		if (distance < minDistance) {
-			minDistance = distance;
-			closestTimezone = tz.name;
-		}
-	}
-	
-	return closestTimezone;
-}
+    return navigator.geolocation.watchPosition(
+      (position) => {
+        callback({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          altitude: position.coords.altitude || undefined,
+          altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
+          heading: position.coords.heading || undefined,
+          speed: position.coords.speed || undefined
+        });
+      },
+      (error) => {
+        if (errorCallback) {
+          errorCallback(new Error(error.message));
+        }
+      },
+      { ...defaultOptions, ...options }
+    );
+  },
 
-// Rate limiting for geolocation requests
-const geoCache = new Map<string, { data: Partial<GeolocationData>; timestamp: number }>();
-const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+  // Clear watch
+  clearWatch(watchId: number) {
+    if (this.isSupported()) {
+      navigator.geolocation.clearWatch(watchId);
+    }
+  }
+};
 
-export async function getCachedGeolocation(ip: string): Promise<Partial<GeolocationData>> {
-	// Check cache first
-	const cached = geoCache.get(ip);
-	const now = Date.now();
-	
-	if (cached && (now - cached.timestamp) < CACHE_DURATION) {
-		return cached.data;
-	}
-	
-	// Get fresh data
-	const geoData = await getGeolocation(ip);
-	
-	// Cache the result
-	geoCache.set(ip, { data: geoData, timestamp: now });
-	
-	// Clean old cache entries periodically
-	if (geoCache.size > 1000) {
-		cleanGeoCache();
-	}
-	
-	return geoData;
-}
+// IP-based geolocation utilities
+export const ipGeolocation = {
+  // Get geolocation from IP using ip-api.com (free)
+  async getFromIPApi(ip?: string): Promise<GeolocationData> {
+    const url = ip ? `${GEOLOCATION_CONFIG.IP_API_URL}/${ip}` : GEOLOCATION_CONFIG.IP_API_URL;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`IP-API request failed: ${response.statusText}`);
+    }
 
-// Clean expired cache entries
-function cleanGeoCache(): void {
-	const now = Date.now();
-	
-	for (const [ip, entry] of geoCache.entries()) {
-		if ((now - entry.timestamp) > CACHE_DURATION) {
-			geoCache.delete(ip);
-		}
-	}
-}
+    const data: IPApiResponse = await response.json();
+    
+    if (data.status !== 'success') {
+      throw new Error('IP-API returned error status');
+    }
 
-// Get user's approximate location for analytics
-export async function getVisitorLocation(request: Request): Promise<{
-	ip: string;
-	country: string;
-	region: string;
-	timezone: string;
-}> {
-	const ip = getClientIP(request);
-	const geoData = await getCachedGeolocation(ip);
-	
-	return {
-		ip,
-		country: geoData.country || 'Unknown',
-		region: geoData.region || 'Unknown',
-		timezone: geoData.timezone || 'UTC'
-	};
-}
+    return {
+      ip: data.query,
+      country: data.country,
+      countryCode: data.countryCode,
+      region: data.regionName,
+      regionCode: data.region,
+      city: data.city,
+      zipCode: data.zip || undefined,
+      latitude: data.lat,
+      longitude: data.lon,
+      timezone: data.timezone,
+      isp: data.isp,
+      organization: data.org,
+      accuracy: 'medium',
+      source: 'ip-api'
+    };
+  },
+
+  // Get geolocation from ipgeolocation.io (paid API with higher accuracy)
+  async getFromIPGeolocation(ip?: string): Promise<GeolocationData> {
+    if (!GEOLOCATION_CONFIG.IPGEOLOCATION_API_KEY) {
+      throw new Error('IPGeolocation API key not configured');
+    }
+
+    const params = new URLSearchParams({
+      apiKey: GEOLOCATION_CONFIG.IPGEOLOCATION_API_KEY,
+      fields: 'geo,time_zone,isp'
+    });
+
+    if (ip) {
+      params.append('ip', ip);
+    }
+
+    const response = await fetch(`${GEOLOCATION_CONFIG.IPGEOLOCATION_URL}?${params}`);
+    if (!response.ok) {
+      throw new Error(`IPGeolocation request failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    return {
+      ip: data.ip,
+      country: data.country_name,
+      countryCode: data.country_code2,
+      region: data.state_prov,
+      regionCode: data.state_code,
+      city: data.city,
+      zipCode: data.zipcode || undefined,
+      latitude: parseFloat(data.latitude),
+      longitude: parseFloat(data.longitude),
+      timezone: data.time_zone?.name || '',
+      isp: data.isp,
+      organization: data.organization,
+      accuracy: 'high',
+      source: 'ipgeolocation'
+    };
+  },
+
+  // Get geolocation with fallback providers
+  async getWithFallback(ip?: string): Promise<GeolocationData> {
+    const providers = [
+      () => this.getFromIPGeolocation(ip),
+      () => this.getFromIPApi(ip)
+    ];
+
+    let lastError: Error | null = null;
+
+    for (const provider of providers) {
+      try {
+        const result = await provider();
+        if (GEOLOCATION_CONFIG.DEBUG) {
+          console.log('Geolocation success:', result.source);
+        }
+        return result;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error('Unknown error');
+        if (GEOLOCATION_CONFIG.DEBUG) {
+          console.warn('Geolocation provider failed:', lastError.message);
+        }
+      }
+    }
+
+    throw lastError || new Error('All geolocation providers failed');
+  }
+};
+
+// Main geolocation service
+export const geolocationService = {
+  // Get comprehensive geolocation data
+  async getGeolocation(options: {
+    ip?: string;
+    useBrowser?: boolean;
+    useCache?: boolean;
+    accuracy?: 'high' | 'medium' | 'low';
+  } = {}): Promise<GeolocationData> {
+    const { ip, useBrowser = false, useCache = true, accuracy = 'medium' } = options;
+    
+    // Generate cache key
+    const cacheKey = ip || 'current_ip';
+    
+    // Check cache first
+    if (useCache && geoCache.has(cacheKey)) {
+      const cached = geoCache.get(cacheKey)!;
+      if (Date.now() - cached.timestamp < GEOLOCATION_CONFIG.CACHE_DURATION) {
+        return { ...cached.data, source: 'cached' };
+      }
+    }
+
+    let geolocationData: GeolocationData;
+
+    try {
+      // Try browser geolocation first if requested and no IP specified
+      if (useBrowser && !ip && browserGeolocation.isSupported()) {
+        try {
+          const browserPos = await browserGeolocation.getCurrentPosition({
+            enableHighAccuracy: accuracy === 'high'
+          });
+
+          // Reverse geocode to get address info
+          const addressData = await this.reverseGeocode(
+            browserPos.latitude,
+            browserPos.longitude
+          );
+
+          geolocationData = {
+            ...addressData,
+            latitude: browserPos.latitude,
+            longitude: browserPos.longitude,
+            accuracy: browserPos.accuracy < 100 ? 'high' : 'medium',
+            source: 'browser'
+          };
+        } catch (browserError) {
+          if (GEOLOCATION_CONFIG.DEBUG) {
+            console.warn('Browser geolocation failed:', browserError);
+          }
+          // Fall back to IP geolocation
+          geolocationData = await ipGeolocation.getWithFallback(ip);
+        }
+      } else {
+        // Use IP geolocation
+        geolocationData = await ipGeolocation.getWithFallback(ip);
+      }
+
+      // Cache the result
+      if (useCache) {
+        geoCache.set(cacheKey, {
+          data: geolocationData,
+          timestamp: Date.now()
+        });
+      }
+
+      return geolocationData;
+    } catch (error) {
+      console.error('Geolocation failed:', error);
+      
+      // Return fallback data
+      return {
+        ip: ip || 'unknown',
+        country: 'Unknown',
+        countryCode: 'XX',
+        region: 'Unknown',
+        regionCode: 'XX',
+        city: 'Unknown',
+        latitude: 0,
+        longitude: 0,
+        timezone: 'UTC',
+        accuracy: 'low',
+        source: 'cached'
+      };
+    }
+  },
+
+  // Reverse geocode coordinates to address
+  async reverseGeocode(latitude: number, longitude: number): Promise<Partial<GeolocationData>> {
+    try {
+      // Use a free reverse geocoding service (nominatim)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
+        {
+          headers: {
+            'User-Agent': 'Hannisol-Solana-Checker'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Reverse geocoding failed');
+      }
+
+      const data = await response.json();
+      const address = data.address || {};
+
+      return {
+        ip: 'browser',
+        country: address.country || 'Unknown',
+        countryCode: address.country_code?.toUpperCase() || 'XX',
+        region: address.state || address.region || 'Unknown',
+        regionCode: address.state_code || 'XX',
+        city: address.city || address.town || address.village || 'Unknown',
+        zipCode: address.postcode,
+        timezone: await this.getTimezoneFromCoords(latitude, longitude)
+      };
+    } catch (error) {
+      console.error('Reverse geocoding failed:', error);
+      return {
+        ip: 'browser',
+        country: 'Unknown',
+        countryCode: 'XX',
+        region: 'Unknown',
+        regionCode: 'XX',
+        city: 'Unknown',
+        timezone: 'UTC'
+      };
+    }
+  },
+
+  // Get timezone from coordinates
+  async getTimezoneFromCoords(latitude: number, longitude: number): Promise<string> {
+    try {
+      // Use browser's Intl API if available
+      if (browser && Intl.DateTimeFormat) {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+      }
+
+      // Fallback to a timezone API
+      const response = await fetch(
+        `https://api.timezonedb.com/v2.1/get-time-zone?key=demo&format=json&by=position&lat=${latitude}&lng=${longitude}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.zoneName || 'UTC';
+      }
+    } catch (error) {
+      console.error('Timezone lookup failed:', error);
+    }
+
+    return 'UTC';
+  },
+
+  // Calculate distance between two points
+  calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = this.toRadians(lat2 - lat1);
+    const dLon = this.toRadians(lon2 - lon1);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  },
+
+  // Convert degrees to radians
+  toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+  },
+
+  // Get country flag emoji
+  getCountryFlag(countryCode: string): string {
+    if (!countryCode || countryCode.length !== 2) return '🌍';
+    
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    
+    return String.fromCodePoint(...codePoints);
+  },
+
+  // Get country name from code
+  getCountryName(countryCode: string): string {
+    const countries: Record<string, string> = {
+      'US': 'United States',
+      'CA': 'Canada',
+      'GB': 'United Kingdom',
+      'DE': 'Germany',
+      'FR': 'France',
+      'IT': 'Italy',
+      'ES': 'Spain',
+      'NL': 'Netherlands',
+      'SE': 'Sweden',
+      'NO': 'Norway',
+      'DK': 'Denmark',
+      'FI': 'Finland',
+      'AU': 'Australia',
+      'NZ': 'New Zealand',
+      'JP': 'Japan',
+      'KR': 'South Korea',
+      'CN': 'China',
+      'IN': 'India',
+      'BR': 'Brazil',
+      'MX': 'Mexico',
+      'AR': 'Argentina',
+      'CL': 'Chile',
+      'CO': 'Colombia',
+      'PE': 'Peru',
+      'VE': 'Venezuela',
+      'ZA': 'South Africa',
+      'NG': 'Nigeria',
+      'EG': 'Egypt',
+      'MA': 'Morocco',
+      'KE': 'Kenya',
+      'GH': 'Ghana',
+      'TR': 'Turkey',
+      'RU': 'Russia',
+      'UA': 'Ukraine',
+      'PL': 'Poland',
+      'RO': 'Romania',
+      'GR': 'Greece',
+      'BG': 'Bulgaria',
+      'HR': 'Croatia',
+      'SI': 'Slovenia',
+      'SK': 'Slovakia',
+      'CZ': 'Czech Republic',
+      'HU': 'Hungary',
+      'AT': 'Austria',
+      'CH': 'Switzerland',
+      'BE': 'Belgium',
+      'LU': 'Luxembourg',
+      'IE': 'Ireland',
+      'PT': 'Portugal',
+      'IS': 'Iceland',
+      'MT': 'Malta',
+      'CY': 'Cyprus'
+    };
+
+    return countries[countryCode.toUpperCase()] || countryCode;
+  },
+
+  // Clear geolocation cache
+  clearCache() {
+    geoCache.clear();
+  },
+
+  // Get cache statistics
+  getCacheStats() {
+    return {
+      size: geoCache.size,
+      entries: Array.from(geoCache.entries()).map(([key, value]) => ({
+        key,
+        timestamp: value.timestamp,
+        age: Date.now() - value.timestamp,
+        country: value.data.country
+      }))
+    };
+  }
+};
+
+// Export main geolocation object
+export const geolocation = {
+  browser: browserGeolocation,
+  ip: ipGeolocation,
+  service: geolocationService
+};
