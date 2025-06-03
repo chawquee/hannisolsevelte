@@ -1,6 +1,262 @@
-# Package Managers
+# ==============================================
+# HANNISOL SOLANA ADDRESS CHECKER - PRETTIER IGNORE
+# ==============================================
+
+# ==============================================
+# BUILD & DISTRIBUTION FILES
+# ==============================================
+# SvelteKit build output
+build/
+.svelte-kit/
+dist/
+static/build/
+
+# Vite build cache
+.vite/
+
+# ==============================================
+# DEPENDENCIES
+# ==============================================
+# Node modules
+node_modules/
+
+# Package manager files
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
-bun.lock
-bun.lockb
+pnpm-lock.yaml
+
+# ==============================================
+# GENERATED FILES
+# ==============================================
+# Auto-generated TypeScript definitions
+*.d.ts
+!src/**/*.d.ts
+
+# Generated API documentation
+docs/api/
+api-docs/
+
+# Generated schema files
+schema.generated.*
+
+# ==============================================
+# DATABASE FILES
+# ==============================================
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+database/
+
+# SQL dumps and migrations
+*.sql
+migrations/*.sql
+
+# ==============================================
+# LOG FILES
+# ==============================================
+# All log files
+*.log
+logs/
+
+# ==============================================
+# CACHE & TEMPORARY FILES
+# ==============================================
+# Cache directories
+.cache/
+.tmp/
+tmp/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# ==============================================
+# CONFIGURATION FILES (Keep formatting)
+# ==============================================
+# Environment files (often have specific formatting)
+.env*
+!.env.example
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# ==============================================
+# THIRD-PARTY ASSETS
+# ==============================================
+# Vendor files and third-party libraries
+vendor/
+lib/
+libs/
+
+# Static assets that shouldn't be formatted
+static/images/
+static/fonts/
+static/icons/
+
+# ==============================================
+# DOCUMENTATION
+# ==============================================
+# Markdown files (may have specific formatting)
+*.md
+CHANGELOG.md
+README.md
+LICENSE.md
+
+# Documentation generated files
+docs/build/
+storybook-static/
+
+# ==============================================
+# DATA FILES
+# ==============================================
+# JSON data files (may have specific structure)
+data/
+fixtures/
+seed/
+
+# CSV and other data formats
+*.csv
+*.tsv
+*.json
+!package.json
+!tsconfig.json
+!svelte.config.js
+
+# ==============================================
+# MINIFIED FILES
+# ==============================================
+# Already minified/optimized files
+*.min.js
+*.min.css
+*.min.html
+
+# Bundled files
+bundle.*
+chunks/
+
+# ==============================================
+# LEGACY/COMPATIBILITY FILES
+# ==============================================
+# IE compatibility files
+ie-polyfills.*
+
+# Legacy browser support
+polyfills/
+
+# ==============================================
+# ANALYTICS & TRACKING
+# ==============================================
+# Analytics configuration files
+analytics/
+gtag.*
+ga.*
+
+# ==============================================
+# ERROR PAGES & TEMPLATES
+# ==============================================
+# Error page templates (may have specific formatting)
+error-pages/
+templates/email/
+
+# ==============================================
+# SECURITY FILES
+# ==============================================
+# Security policy files
+security.txt
+.well-known/
+
+# ==============================================
+# BACKUP FILES
+# ==============================================
+# Backup and temporary files
+*.bak
+*.backup
+*.old
+
+# ==============================================
+# HANNISOL SPECIFIC
+# ==============================================
+# Brand guidelines and assets
+brand/
+assets/raw/
+
+# Search result cache files
+search-cache/
+
+# Risk analysis data
+risk-data/
+
+# ==============================================
+# TEST FILES (Selective formatting)
+# ==============================================
+# Test snapshots (maintain exact format)
+**/__snapshots__/
+**/*.snap
+
+# Test fixtures
+tests/fixtures/
+test/fixtures/
+
+# ==============================================
+# MOBILE & PWA
+# ==============================================
+# Service worker files (may have specific formatting)
+sw.js
+service-worker.js
+
+# Manifest files
+manifest.json
+manifest.webmanifest
+
+# ==============================================
+# INTERNATIONALIZATION
+# ==============================================
+# Translation files (maintain structure)
+locales/
+i18n/
+*.po
+*.pot
+
+# ==============================================
+# MONITORING & METRICS
+# ==============================================
+# Monitoring configuration
+monitoring/
+metrics/
+
+# ==============================================
+# CERTIFICATES & KEYS
+# ==============================================
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+ssl/
+certificates/
+
+# ==============================================
+# SCRIPTS & AUTOMATION
+# ==============================================
+# Shell scripts (may have specific formatting)
+*.sh
+scripts/deploy/
+scripts/backup/
+
+# ==============================================
+# DESIGN SYSTEM
+# ==============================================
+# Design tokens and system files
+design-tokens/
+style-guide/
+
+# ==============================================
+# END OF PRETTIER IGNORE
+# ==============================================

@@ -1,0 +1,586 @@
+// robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_app/
+Disallow: /share/
+Disallow: /legal/
+
+# Sitemap
+Sitemap: https://hannisol.com/sitemap.xml
+
+# Crawl-delay for bots
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+---
+
+// .env
+# Environment Configuration
+NODE_ENV=production
+PUBLIC_SITE_URL=https://hannisol.com
+
+# Security
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-512-bits-long
+ADMIN_EMAIL=admin@hannisol.com
+ADMIN_PASSWORD_HASH=$2a$12$example.replace.with.real.bcrypt.hash
+
+# Database
+DATABASE_URL=./database/hannisol.db
+
+# Solana RPC Endpoints
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+SOLANA_RPC_URL_BACKUP=https://solana-api.projectserum.com
+
+# Analytics & Ads
+GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXX
+ADSENSE_SLOT_ID=XXXXXXXXX
+MEDIA_NET_SITE_ID=XXXXXXX
+COINZILLA_ZONE_ID=XXXXXXX
+AADS_ZONE_ID=XXXXXXX
+
+# Third-party Services
+IP_GEOLOCATION_API_KEY=your-ip-geolocation-api-key
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=noreply@hannisol.com
+SMTP_PASS=your-email-app-password
+
+# Cloudflare (if using)
+CLOUDFLARE_ZONE_ID=your-cloudflare-zone-id
+CLOUDFLARE_API_TOKEN=your-cloudflare-api-token
+
+# Rate Limiting
+RATE_LIMIT_SEARCH_PER_HOUR=100
+RATE_LIMIT_API_PER_HOUR=1000
+RATE_LIMIT_ADMIN_PER_HOUR=200
+
+# File Upload Limits
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=image/jpeg,image/png,image/gif,application/pdf
+
+---
+
+// .env.example
+# Environment Configuration
+NODE_ENV=development
+PUBLIC_SITE_URL=http://localhost:5173
+
+# Security (CHANGE THESE IN PRODUCTION!)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-512-bits-long
+ADMIN_EMAIL=admin@hannisol.com
+ADMIN_PASSWORD_HASH=your-bcrypt-hashed-password
+
+# Database
+DATABASE_URL=./database/hannisol.db
+
+# Solana RPC Endpoints
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+SOLANA_RPC_URL_BACKUP=https://solana-api.projectserum.com
+
+# Analytics & Ads (Optional - Replace with your IDs)
+GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXX
+ADSENSE_SLOT_ID=XXXXXXXXX
+MEDIA_NET_SITE_ID=XXXXXXX
+COINZILLA_ZONE_ID=XXXXXXX
+AADS_ZONE_ID=XXXXXXX
+
+# Third-party Services (Optional)
+IP_GEOLOCATION_API_KEY=your-ip-geolocation-api-key
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+
+# Email Configuration (Optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=noreply@hannisol.com
+SMTP_PASS=your-email-app-password
+
+# Cloudflare (Optional)
+CLOUDFLARE_ZONE_ID=your-cloudflare-zone-id
+CLOUDFLARE_API_TOKEN=your-cloudflare-api-token
+
+# Rate Limiting
+RATE_LIMIT_SEARCH_PER_HOUR=100
+RATE_LIMIT_API_PER_HOUR=1000
+RATE_LIMIT_ADMIN_PER_HOUR=200
+
+# File Upload Limits
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=image/jpeg,image/png,image/gif,application/pdf
+
+---
+
+// .gitignore
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+.svelte-kit/
+build/
+dist/
+.output/
+.vercel/
+.netlify/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+database/*.db
+database/*.sqlite
+database/backup/*.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Production files
+/static/sitemap.xml
+/static/robots.txt
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+
+# PM2 files
+ecosystem.config.js.backup
+
+# Backup files
+*.bak
+*.backup
+
+---
+
+// .npmrc
+# Registry configuration
+registry=https://registry.npmjs.org/
+
+# Security
+audit-level=moderate
+fund=false
+
+# Performance
+prefer-offline=true
+progress=true
+
+# Package resolution
+save-exact=true
+package-lock=true
+
+# Cache settings
+cache-max=86400000
+
+# Node version management
+engine-strict=true
+
+---
+
+// .prettierignore
+# Build outputs
+.svelte-kit/
+build/
+dist/
+.output/
+
+# Dependencies
+node_modules/
+
+# Generated files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Documentation
+*.md
+
+# Configuration files
+*.config.js
+*.config.ts
+
+# Database files
+*.db
+*.sqlite
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+---
+
+// .prettierrc
+{
+  "useTabs": true,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "printWidth": 100,
+  "semi": true,
+  "tabWidth": 2,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "quoteProps": "as-needed",
+  "jsxSingleQuote": true,
+  "embeddedLanguageFormatting": "auto",
+  "htmlWhitespaceSensitivity": "css",
+  "vueIndentScriptAndStyle": false,
+  "proseWrap": "preserve",
+  "insertPragma": false,
+  "requirePragma": false,
+  "overrides": [
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte"
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown",
+        "proseWrap": "always"
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json",
+        "tabWidth": 2
+      }
+    }
+  ]
+}
+
+---
+
+// ecosystem.config.js
+module.exports = {
+  apps: [
+    {
+      name: 'hannisol-production',
+      script: 'build/index.js',
+      instances: 'max',
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        PORT: 3000
+      },
+      // Logging
+      log_file: './logs/combined.log',
+      out_file: './logs/out.log',
+      error_file: './logs/error.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      
+      // Process management
+      max_memory_restart: '1G',
+      restart_delay: 4000,
+      max_restarts: 10,
+      min_uptime: '10s',
+      
+      // Monitoring
+      watch: false,
+      ignore_watch: ['node_modules', 'logs', 'database'],
+      
+      // Advanced features
+      source_map_support: true,
+      instance_var: 'INSTANCE_ID',
+      
+      // Health check
+      health_check_grace_period: 3000,
+      health_check_fatal_exceptions: true
+    },
+    {
+      name: 'hannisol-staging',
+      script: 'build/index.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'staging',
+        PORT: 3001
+      },
+      log_file: './logs/staging-combined.log',
+      out_file: './logs/staging-out.log',
+      error_file: './logs/staging-error.log',
+      max_memory_restart: '512M'
+    }
+  ],
+  
+  deploy: {
+    production: {
+      user: 'deploy',
+      host: ['your-server-ip'],
+      ref: 'origin/main',
+      repo: 'https://github.com/yourusername/hannisol.git',
+      path: '/var/www/hannisol',
+      'pre-deploy-local': '',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production',
+      'pre-setup': '',
+      'ssh_options': 'StrictHostKeyChecking=no'
+    },
+    staging: {
+      user: 'deploy',
+      host: 'staging-server-ip',
+      ref: 'origin/develop',
+      repo: 'https://github.com/yourusername/hannisol.git',
+      path: '/var/www/hannisol-staging',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env staging'
+    }
+  }
+};
+
+---
+
+// eslint.config.js
+import js from '@eslint/js';
+import ts from 'typescript-eslint';
+import svelte from 'eslint-plugin-svelte';
+import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+
+/** @type {import('eslint').Linter.FlatConfig[]} */
+export default [
+  js.configs.recommended,
+  ...ts.configs.recommended,
+  ...svelte.configs['flat/recommended'],
+  prettier,
+  ...svelte.configs['flat/prettier'],
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    }
+  },
+  {
+    files: ['**/*.svelte'],
+    languageOptions: {
+      parserOptions: {
+        parser: ts.parser
+      }
+    }
+  },
+  {
+    ignores: [
+      'build/',
+      '.svelte-kit/',
+      'dist/',
+      'node_modules/',
+      '*.config.js',
+      '*.config.ts'
+    ]
+  },
+  {
+    rules: {
+      // TypeScript rules
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      
+      // Svelte rules
+      'svelte/valid-compile': 'error',
+      'svelte/no-at-debug-tags': 'warn',
+      'svelte/no-unused-svelte-ignore': 'error',
+      
+      // General rules
+      'no-console': 'warn',
+      'no-debugger': 'error',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'eqeqeq': ['error', 'always'],
+      'curly': ['error', 'all'],
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-script-url': 'error',
+      'no-alert': 'warn'
+    }
+  }
+];
+
+---
+
+// tsconfig.json
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": false,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+    "baseUrl": ".",
+    "paths": {
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "$app/*": ["./.svelte-kit/runtime/app/*"],
+      "$service-worker": ["./.svelte-kit/runtime/service-worker"],
+      "$env/dynamic/private": ["./.svelte-kit/runtime/env/dynamic/private"],
+      "$env/dynamic/public": ["./.svelte-kit/runtime/env/dynamic/public"],
+      "$env/static/private": ["./.svelte-kit/runtime/env/static/private"],
+      "$env/static/public": ["./.svelte-kit/runtime/env/static/public"]
+    },
+    "types": ["node", "@types/better-sqlite3"]
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "tests/**/*.js",
+    "tests/**/*.ts",
+    "vite.config.js",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules/**",
+    "build/**",
+    ".svelte-kit/**",
+    "dist/**"
+  ]
+}

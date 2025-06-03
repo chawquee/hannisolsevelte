@@ -1,23 +1,409 @@
-node_modules
+# ==============================================
+# HANNISOL SOLANA ADDRESS CHECKER - GIT IGNORE
+# ==============================================
 
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Env
+# ==============================================
+# ENVIRONMENT & SECURITY FILES
+# ==============================================
+# Never commit environment variables or secrets
 .env
-.env.*
-!.env.example
-!.env.test
+.env.local
+.env.production
+.env.staging
+.env.*.local
 
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+# API keys and secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+config/secrets/
+
+# ==============================================
+# NODE.JS & NPM
+# ==============================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package manager files
+.pnpm-store/
+.yarn/
+.npm/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ==============================================
+# SVELTEKIT & BUILD FILES
+# ==============================================
+# SvelteKit build output
+build/
+.svelte-kit/
+
+# Vite build cache
+.vite/
+dist/
+dist-ssr/
+
+# Static adapter output (if using)
+static-build/
+
+# ==============================================
+# DATABASE FILES
+# ==============================================
+# SQLite databases (keep structure, not data)
+*.db
+*.sqlite
+*.sqlite3
+database/*.db
+database/*.sqlite
+database/backup/*.db*
+database/backup/*.sqlite*
+
+# Database logs
+*.db-journal
+*.db-shm
+*.db-wal
+
+# PostgreSQL dumps
+*.sql
+*.dump
+
+# ==============================================
+# LOG FILES
+# ==============================================
+# Application logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# PM2 logs
+~/.pm2/logs/
+ecosystem.config.js.bak
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ==============================================
+# CACHE & TEMPORARY FILES
+# ==============================================
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Thumbnails
+._*
+Thumbs.db
+ehthumbs.db
+
+# ==============================================
+# EDITOR & IDE FILES
+# ==============================================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+
+# ==============================================
+# OPERATING SYSTEM FILES
+# ==============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================
+# DEVELOPMENT & TESTING
+# ==============================================
+# Test coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Jest
+jest-coverage/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Storybook build outputs
+storybook-static/
+
+# ==============================================
+# ANALYTICS & MONITORING
+# ==============================================
+# Analytics data (keep aggregated, not raw)
+analytics/raw/
+analytics/backup/
+analytics/*.json
+analytics/*.csv
+
+# Monitoring files
+monitoring/
+metrics/
+health-checks/
+
+# ==============================================
+# DEPLOYMENT & PRODUCTION
+# ==============================================
+# Production builds (built on server)
+build/
+dist/
+
+# Docker
+.dockerignore
+Dockerfile.prod
+docker-compose.override.yml
+docker-compose.prod.yml
+
+# Serverless
+.serverless/
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+
+# Kubernetes
+*.yaml.bak
+*.yml.bak
+
+# ==============================================
+# BACKUP & ARCHIVE FILES
+# ==============================================
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.tmp
+
+# ==============================================
+# SECURITY & CERTIFICATES
+# ==============================================
+# SSL certificates
+*.crt
+*.pem
+*.key
+*.p12
+*.pfx
+ssl/
+certificates/
+
+# GPG keys
+*.gpg
+*.asc
+
+# SSH keys
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.pub
+
+# ==============================================
+# REVENUE & BUSINESS DATA
+# ==============================================
+# Sensitive business data
+revenue/
+financial/
+ad-performance/
+affiliate-data/
+user-data/
+
+# Export files
+exports/
+reports/
+*.xlsx
+*.csv
+
+# ==============================================
+# BRAND & ASSETS (Commit source, not processed)
+# ==============================================
+# Processed images (keep source)
+static/images/processed/
+static/images/optimized/
+static/images/thumbnails/
+
+# Generated assets
+static/generated/
+
+# ==============================================
+# MISC FILES
+# ==============================================
+# Runtime files
+.runtime/
+runtime/
+
+# Lock files for tools
+.tool-versions
+.python-version
+.ruby-version
+.node-version
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+.env.production.local
+.env.local
+.env.development.local
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ==============================================
+# PROJECT SPECIFIC
+# ==============================================
+# Hannisol specific files to ignore
+search-history/
+ip-logs/
+risk-analysis-cache/
+blockchain-cache/
+
+# Keep empty directories with .gitkeep
+!.gitkeep
+!**/.gitkeep

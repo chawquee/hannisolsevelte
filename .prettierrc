@@ -1,15 +1,261 @@
 {
-	"useTabs": true,
-	"singleQuote": true,
-	"trailingComma": "none",
-	"printWidth": 100,
-	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
-	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte"
-			}
-		}
-	]
+  // ==============================================
+  // HANNISOL SOLANA ADDRESS CHECKER - PRETTIER CONFIG
+  // ==============================================
+  
+  // ==============================================
+  // BASIC FORMATTING OPTIONS
+  // ==============================================
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  
+  // ==============================================
+  // INDENTATION & SPACING
+  // ==============================================
+  "useTabs": false,
+  "tabWidth": 2,
+  "printWidth": 100,
+  
+  // ==============================================
+  // LINE ENDINGS
+  // ==============================================
+  "endOfLine": "lf",
+  
+  // ==============================================
+  // SVELTE SPECIFIC CONFIGURATION
+  // ==============================================
+  "plugins": [
+    "prettier-plugin-svelte"
+  ],
+  
+  // ==============================================
+  // FILE TYPE OVERRIDES
+  // ==============================================
+  "overrides": [
+    // Svelte files
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte",
+        "svelteStrictMode": false,
+        "svelteBracketNewLine": false,
+        "svelteAllowShorthand": true,
+        "svelteIndentScriptAndStyle": true,
+        "printWidth": 100
+      }
+    },
+    
+    // TypeScript files
+    {
+      "files": ["*.ts", "*.tsx"],
+      "options": {
+        "parser": "typescript",
+        "singleQuote": true,
+        "semi": true,
+        "trailingComma": "none"
+      }
+    },
+    
+    // JavaScript files
+    {
+      "files": ["*.js", "*.jsx"],
+      "options": {
+        "parser": "babel",
+        "singleQuote": true,
+        "semi": true
+      }
+    },
+    
+    // JSON files (package.json, tsconfig.json, etc.)
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json",
+        "singleQuote": false,
+        "trailingComma": "none",
+        "printWidth": 120
+      }
+    },
+    
+    // CSS and SCSS files
+    {
+      "files": ["*.css", "*.scss", "*.sass"],
+      "options": {
+        "parser": "css",
+        "singleQuote": false,
+        "printWidth": 120
+      }
+    },
+    
+    // HTML files
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "html",
+        "singleQuote": false,
+        "bracketSameLine": true,
+        "printWidth": 120
+      }
+    },
+    
+    // Markdown files (minimal formatting to preserve structure)
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown",
+        "printWidth": 80,
+        "proseWrap": "preserve",
+        "singleQuote": false
+      }
+    },
+    
+    // YAML files
+    {
+      "files": ["*.yml", "*.yaml"],
+      "options": {
+        "parser": "yaml",
+        "singleQuote": false,
+        "printWidth": 120
+      }
+    },
+    
+    // Configuration files
+    {
+      "files": [
+        ".eslintrc.*",
+        ".prettierrc.*",
+        "*.config.js",
+        "*.config.ts"
+      ],
+      "options": {
+        "printWidth": 120,
+        "singleQuote": true
+      }
+    },
+    
+    // SQL files
+    {
+      "files": "*.sql",
+      "options": {
+        "parser": "sql",
+        "printWidth": 120,
+        "keywordCase": "upper"
+      }
+    },
+    
+    // Environment files (preserve exact formatting)
+    {
+      "files": [".env*"],
+      "options": {
+        "requirePragma": true
+      }
+    },
+    
+    // API route files (SvelteKit specific)
+    {
+      "files": [
+        "**/routes/**/*.ts",
+        "**/routes/**/*.js",
+        "**/**/+*.ts",
+        "**/**/+*.js"
+      ],
+      "options": {
+        "printWidth": 100,
+        "singleQuote": true,
+        "semi": true
+      }
+    },
+    
+    // Component files
+    {
+      "files": [
+        "**/components/**/*.svelte",
+        "**/lib/**/*.svelte"
+      ],
+      "options": {
+        "printWidth": 100,
+        "svelteAllowShorthand": true,
+        "svelteStrictMode": false
+      }
+    },
+    
+    // Database schema and migration files
+    {
+      "files": [
+        "**/database/**/*.sql",
+        "**/migrations/**/*.sql",
+        "**/schema/**/*.sql"
+      ],
+      "options": {
+        "parser": "sql",
+        "printWidth": 120,
+        "keywordCase": "upper",
+        "functionCase": "upper"
+      }
+    },
+    
+    // Documentation files
+    {
+      "files": [
+        "docs/**/*.md",
+        "README*.md",
+        "CHANGELOG*.md"
+      ],
+      "options": {
+        "parser": "markdown",
+        "printWidth": 80,
+        "proseWrap": "always"
+      }
+    },
+    
+    // Test files
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.js",
+        "**/*.spec.ts",
+        "**/*.spec.js"
+      ],
+      "options": {
+        "printWidth": 120,
+        "singleQuote": true
+      }
+    }
+  ],
+  
+  // ==============================================
+  // IGNORED PATTERNS
+  // ==============================================
+  "ignorePath": ".prettierignore",
+  
+  // ==============================================
+  // EXPERIMENTAL FEATURES
+  // ==============================================
+  "experimentalTernaries": false,
+  
+  // ==============================================
+  // EMBEDDED LANGUAGE FORMATTING
+  // ==============================================
+  "embeddedLanguageFormatting": "auto",
+  
+  // ==============================================
+  // COMMENTS
+  // ==============================================
+  // Preserve formatting of comments in certain contexts
+  "htmlWhitespaceSensitivity": "css",
+  
+  // ==============================================
+  // HANNISOL SPECIFIC SETTINGS
+  // ==============================================
+  // These settings are optimized for the Hannisol project structure
+  // and maintain consistency with the brand guidelines
+  
+  // Brand-related files (preserve exact formatting for brand consistency)
+  "requirePragma": false,
+  "insertPragma": false
 }
